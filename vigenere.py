@@ -1,6 +1,5 @@
 #!/usr/bin/env jython
-# -*- coding: utf-8 -*-
 
 """
-This script encodes a message with the Vigenère cipher.
+This script encodes a message with the Vigenere cipher.
 """
