@@ -4,9 +4,6 @@
 This script encodes a message with the Vigenere cipher.
 """
 
-ord("a")
-chr(97)
-
 def encrypt(plaintext, key):
   plaintext_normalized = ""
   for character in plaintext:
