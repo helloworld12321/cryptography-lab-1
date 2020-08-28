@@ -1,2 +1,6 @@
 .jython_cache/
 *.pybak
+
+# Super-duper secret:
+plaintext.txt
+key.txt
