@@ -1,5 +1,8 @@
 .jython_cache/
 *.pybak
+*.class
+
+.vscode/
 
 # Super-duper secret:
 plaintext.txt

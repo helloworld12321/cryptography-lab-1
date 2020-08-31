@@ -4,15 +4,19 @@
 This script encodes a message with the Vigenere cipher.
 """
 
-def encrypt(plaintext, key):
-  plaintext_normalized = ""
-  for character in plaintext:
+def normalize(text):
+  text_normalized = ""
+  for character in text:
     if "a" <= character <= "z":
-      plaintext_normalized += character
+      text_normalized += character
     elif "A" <= character <= "Z":
-      plaintext_normalized += character.lower()
+      text_normalized += character.lower()
     else:
       pass
+  return text_normalized
+
+def encrypt(plaintext, key):
+  plaintext_normalized = normalize(plaintext)
   ciphertext = ""
   for i in range(len(plaintext_normalized)):
     key_character = key[i % len(key)]
@@ -22,33 +26,36 @@ def encrypt(plaintext, key):
 
 
 def decrypt(ciphertext, key):
+  ciphertext_normalized = normalize(ciphertext)
   plaintext = ""
-  for i in range(len(ciphertext)):
+  for i in range(len(ciphertext_normalized)):
     key_character = key[i % len(key)]
-    next_character = chr((((ord(ciphertext[i]) - 97 - (ord(key_character) - 97)) % 26)+ 97))
+    next_character = chr((((ord(ciphertext_normalized[i]) - 97 - (ord(key_character) - 97)) % 26)+ 97))
     plaintext += next_character
   return plaintext
 
-answer = raw_input("Do you want to encrypt or decrypt? (e/d) ")
-
-if answer.startswith("e") or answer.startswith("E"):
-  should_encrypt = True
-elif answer.startswith("d") or answer.startswith("D"):
-  should_encrypt = False
-else:
-  raise Exception("I don't know what that means, sorry! :(")
-
-key = raw_input("key: ")
-
-text = ""
-while True:
-  line = raw_input("next line of text (type return to end): ")
-  if line == "":
-    break
+def main():
+  answer = raw_input("Do you want to encrypt or decrypt? (e/d) ")
+  if answer.startswith("e") or answer.startswith("E"):
+    should_encrypt = True
+  elif answer.startswith("d") or answer.startswith("D"):
+    should_encrypt = False
   else:
-    text += line
+    raise Exception("I don't know what that means, sorry! :(")
+  key = raw_input("key: ")
+  text = ""
+  while True:
+    line = raw_input("next line of text (type return to end): ")
+    if line == "":
+      break
+    else:
+      text += line
+  if should_encrypt:
+    print encrypt(text, key)
+  else:
+    print decrypt(text, key)
 
-if should_encrypt:
-  print encrypt(text, key)
-else:
-  print decrypt(text, key)
+# Only execute the main function if we're running the `vigenere.py` file
+# directly (as opposed to importing vigenere.py from another file).
+if __name__ == '__main__':
+  main()
