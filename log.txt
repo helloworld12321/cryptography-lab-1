@@ -5,7 +5,7 @@ Up" as their plaintext, so just for fun, I'm going to do a first pass over all
 of the cipher texts to check them against the verse and the chorus. 🙃
 
 To help with this, I've written a quick script named
-`known_plaintext_checker.py`, which can be invoked like so:
+`plaintext_checker.py`, which can be invoked like so:
 
 ```sh
 jython ./plaintext_checker.py -p 'plaintext fragment' ciphertext1.txt ciphertext2.txt ciphertext3.txt
