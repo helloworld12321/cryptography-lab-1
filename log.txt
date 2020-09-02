@@ -40,3 +40,46 @@ itisaperiodofcivilwarrebelspaceshipsstrikingfromahiddenbasehavewontheirfirstvict
 ```
 
 with the key `tensersfloatingdisk`.
+
+---
+
+(Wednesday, September 2. Both Joe and Aaron.)
+
+Okay, so, I'm looking at Prof. Elena's ciphertext, and it looks like the
+sequence "ji" occurs a bunch of times. 
+
+In particular, between the first two occurrences, we can probably count how
+many characters apart they are! 
+
+(23 characters) 
+
+Now, that's not good, since there's no way that the key is 23 letters long, and
+since 23 is prime, there's no way that the key could have been repeated. 
+
+So, we probably have to conclude that those two occurrences of "ji" encode
+different things. 
+
+The sequence "qj" appears a lot (including at the beginning of the text) 
+The distance between the first two occurrences of "qj" is
+
+```jython
+len("japkofclpgauficevhvujgebkgtdjhzctdssphzrvgnrbvvoccgueecjvolblkezgljejhmfyftspacmrknxwfhoiasvifbkaskseuiecjfeihgutlrqvhvvafdvbsupvqluowhzgspglgmj")
+```
+
+(144 characters) 
+
+Which means that the key could be 2, 3, 4, 6, or 8 characters long. 
+ 
+Which is better than nothing, I guess :) 
+
+The distance between the second two occurrences of "qj" is 
+
+```jython
+len("qjapkofclpgauijikgdkctterqzerpdlqgiohjitgweuiwlaspglgmjoffgrwfcctskutfhzgcfblgnkgghee")
+```
+
+(85 characters) 
+
+which means the key could be either 5 or 17 characters long.
+
+Uffda.
