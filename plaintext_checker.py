@@ -26,7 +26,7 @@ def main():
     with open(filename) as file:
       print vigenere.decrypt(
         file.read(),
-        vigenere.normalize(arguments.plaintext),
+        arguments.plaintext,
       )
     print
 

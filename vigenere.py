@@ -17,9 +17,10 @@ def normalize(text):
 
 def encrypt(plaintext, key):
   plaintext_normalized = normalize(plaintext)
+  key_normalized = normalize(key)
   ciphertext = ""
   for i in range(len(plaintext_normalized)):
-    key_character = key[i % len(key)]
+    key_character = key_normalized[i % len(key_normalized)]
     next_character = chr((((ord(plaintext_normalized[i]) - 97 + ord(key_character) - 97) % 26)+ 97))
     ciphertext += next_character
   return ciphertext
@@ -27,9 +28,10 @@ def encrypt(plaintext, key):
 
 def decrypt(ciphertext, key):
   ciphertext_normalized = normalize(ciphertext)
+  key_normalized = normalize(key)
   plaintext = ""
   for i in range(len(ciphertext_normalized)):
-    key_character = key[i % len(key)]
+    key_character = key_normalized[i % len(key_normalized)]
     next_character = chr((((ord(ciphertext_normalized[i]) - 97 - (ord(key_character) - 97)) % 26)+ 97))
     plaintext += next_character
   return plaintext
