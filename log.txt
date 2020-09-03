@@ -83,3 +83,139 @@ len("qjapkofclpgauijikgdkctterqzerpdlqgiohjitgweuiwlaspglgmjoffgrwfcctskutfhzgcf
 which means the key could be either 5 or 17 characters long.
 
 Uffda.
+
+(Wednesday, September 2. Joe.)
+
+Okay, now I'm going to look at Melissa and Ananya's.
+
+The sequence "uw" appears four times. Between the second and third occurrence,
+there are 18 characters. So, the key length could be 2, 3, or 6 characters
+long. I'm going to assume it's six.
+
+To double-check, let's look at the sequence "yh", which occurs four times.
+The distance between the second and third occurrence is
+
+```jython
+len("yhfgrdqnignjuwujikomuuhrixalatehfadvdnislzjsdstr")
+```
+
+(48 characters)
+
+So, the key length could be 2, 3, 4, 6, or 8 characters long. That's not very
+helpful. The distance between the first and second occurrences is
+
+```jython
+len("yhtfwlahhpelcjygjilggpymtzeghuclituunvskkxygfkuwhfihkysxoiiycmrvsimeueywalifdcnlhvflekeesyoxtyyldhaijcekcrbfevaulyrkaiyyseoiuaefeiqflqciojtggiqjhqijqvomttehslrlsnifgrdxafacotifgghitgcfbmtzakfleneejnharufurliviirlhvfobditvloervqxifgghcvstvcyskaxumvsrzeosssguwtkie")
+```
+
+(262 characters)
+
+Now, 262 factorizes into 1, 2, 131, and 262. This probably means that the "yh"s
+here do not encode the same sequence.
+
+The distance between the third and fourth occurrences of "yh" is
+
+```jython
+len("yhtwgiynysukxynlitqnignrdxngniujuvirjcofaiuweftiqftgmftyrfciojtggiqjhqmftyrfciojtggiqjhqeoymtkakjbeankulswckyingfkxydastyjlanviifeakxymstzsmcgmgknejstyynuevbyclrzsulwnx")
+```
+
+(168 characters.)
+
+So, if we look at factors of 168, the key length could be 2, 3, 4, 6, or 8
+characters long. That's still not very helpful.
+
+The sequence "kx" occurs 4 times. The distance between the third and fourth
+pairs is 18, which reinforces the guess that the key has length 6.
+
+The distance between the second and third pairs is
+
+```jython
+len("kxynlitqnignrdxngniujuvirjcofaiuweftiqftgmftyrfciojtggiqjhqmftyrfciojtggiqjhqeoymtkakjbeankulswckyingf")
+```
+
+(102 characters)
+
+Which factorizes into 1, 2, 3, 6, 17, 34, 51, 102, but crucially *not* 8.
+
+I'm now reasonably confident that the key length is six.
+
+Let's divide the ciphertext into 6 fragments. The first fragment consists of
+the characters at indices {0, 6, 12, 18, ...}. The second fragment consists of
+the characters at indices {1, 7, 13, 19, ...}. The third, fourth, fifth, and
+sixth fragments are defined in the same way. These fragments are nice because
+if the key has length six, each fragment has been encoded with the same letter.
+
+```jython
+ciphertext = open("ciphertexts/melissa-and-ananya.txt").read()
+fragments = [ciphertext[i::6] for i in range(6)]
+```
+
+We can see that the most common letter in the first fragment is "y"; I'm going
+to assume that corresponds to "e".
+
+```jython
+from collections import Counter
+Counter(fragments[0])
+# Output:
+# Counter({'y': 15, 'u': 12, 'q': 11, 's': 9, 'j': 8, 'd': 7, 'i': 7, 'o': 6, 'e': 5, 'b': 4, 'f': 4, 'h': 4, 'k': 4, 't': 4, 'x': 4, 'c': 2, 'l': 1, 'v': 1, 'w': 1})
+```
+
+Then, the first letter of the key would have to be
+
+E + ? === Y mod 26
+? === Y - E mod 26
+
+Y - E === 24 - 4 === 20 === U mod 26
+
+We can double-check this guess by seeing what the the second-most-common letter
+in the fragment decodes to:
+
+? + U === U mod 26
+U - U === ? mod 26
+
+U - U === 0 === A mod 26
+
+Which is reasonable, since A is also a pretty common letter.
+
+Now, at this point, we could try to to find more letters from the key. But
+also, there are only so many six-letter English words that start with U
+¯\_(ツ)_/¯ It's reasonable at this point to just go check them all.
+
+```sh
+egrep '^u[a-z]{5}$' </usr/share/dict/words | while read word; do
+  echo "===== $word ====="
+  jython -c "from vigenere import decrypt; print decrypt(open(\"ciphertexts/melissa-and-ananya.txt\").read(), \"$word\")"
+done
+```
+
+If we check every six-letter word starting with U, we find that none of them
+produce a comprehensible plaintext.
+
+So, let's go back to the first fragment. Maybe "y" doesn't correspond to "e";
+maybe the second-most-common letter, "u", corresponds to "e".
+
+Then, the first letter of the key would have to be
+
+E + ? === U mod 26
+? === U - E mod 26
+
+U - E === 20 - 4 === 16 === Q mod 26
+
+There are even fewer six-letter words in English starting with Q than there are
+starting with U. Let's check each one of them.
+
+```sh
+egrep '^q[a-z]{5}$' </usr/share/dict/words | while read word; do
+  echo "===== $word ====="
+  jython -c "from vigenere import decrypt; print decrypt(open(\"ciphertexts/melissa-and-ananya.txt\").read(), \"$word\")"
+done
+```
+
+Hey, one of these works! 🎉
+
+If we decrypt the cyphertext with the key "quasar", we get the following
+plaintext out:
+
+```
+cryptographyorcryptologyisthepracticeandstudyoftechniquesforsecurecommunicationinthepresenceofthirdpartiescalledadversariesmoregenerallycryptographyisaboutconstructingandanalyzingprotocolsthatpreventthirdpartiesorthepublicfromreadingprivatemessagesvariousaspectsininformationsecuritysuchasdataconfidentialitydataintegrityauthenticationandnonrepudiationarecentraltomoderncryptographymoderncryptographyexistsattheintersectionofthedisciplinesofmathematicscomputerscienceelectricalengineeringcommunicationscienceandphysicsapplicationsofcryptographyincludeelectroniccommercechipbasedpaymentcardsdigitalcurrenciescomputerpasswordsandmilitarycommunications
+```
