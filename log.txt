@@ -213,9 +213,122 @@ done
 
 Hey, one of these works! 🎉
 
-If we decrypt the cyphertext with the key "quasar", we get the following
+If we decrypt the ciphertext with the key "quasar", we get the following
 plaintext out:
 
 ```
 cryptographyorcryptologyisthepracticeandstudyoftechniquesforsecurecommunicationinthepresenceofthirdpartiescalledadversariesmoregenerallycryptographyisaboutconstructingandanalyzingprotocolsthatpreventthirdpartiesorthepublicfromreadingprivatemessagesvariousaspectsininformationsecuritysuchasdataconfidentialitydataintegrityauthenticationandnonrepudiationarecentraltomoderncryptographymoderncryptographyexistsattheintersectionofthedisciplinesofmathematicscomputerscienceelectricalengineeringcommunicationscienceandphysicsapplicationsofcryptographyincludeelectroniccommercechipbasedpaymentcardsdigitalcurrenciescomputerpasswordsandmilitarycommunications
+```
+
+Ok, now I'm going to take a look at the running-key cipher.
+
+My plan is take words (like "cryptograpy") and see if they fit anywhere in the
+cipher. (That is, if a substring of the cipher is decrypted using the word
+"cryptography", does the result look like English?) That way, I can poke holes
+in the ciphertext.
+
+To automate this process, I've made a little helper-script named
+`word_checker.py`. You can run it on the command-line like this:
+
+```sh
+jython word_checker.py -k 'cryptography' ciphertexts/running-key-ciphertext.txt 
+```
+
+One could also automate the process of checking for English words in the
+decrypted text, probably using a dictionary file. However, that would take more
+time and effort than just looking over the decrypted fragments by hand.
+
+
+For the word "cryptography", I get a match at character number 608:
+
+```
+Position 608: seasonsaredi
+```
+
+Similarly, for "cryptographic", I get matches at character number 315 and
+character number 417:
+
+```
+Position 315: usadmitisugly
+Position 417: centersinothe
+```
+
+From this, we can probably conclude that the key reads:
+
+```
+... [315] us admit is ugly ... [417] centers in othe(r) ... [608] seasons are di(???) ...
+```
+
+We can also probably conclude that the plaintext reads
+
+```
+... [315] cryptographic ... [417] cryptographic (a) ... [608] cryptography ...
+```
+
+We can go further by checking common two-word phrases that start with
+"cryptographic a". "Cryptographic analysis" didn't yield anything fruitful,
+but "cryptographic algorithms" produced the following matches:
+
+```
+Position 315: usadmitisuglyithasasmug
+Position 417: centersinotherpartsofth
+```
+
+So, we can probably conclude that the key reads:
+
+```
+... [315] us admit is ugly; it has a smug ... [417] centers in other parts of th(e) ... [608] seasons are di(???) ...
+```
+
+And the plaintext reads
+
+```
+... [315] cryptographic algorithms ... [417] cryptographic algorithms (t)... [608] cryptography ...
+```
+
+After trying a few continuations on these fragments ("New cryptographic
+algorithms"? "Public-key cryptography"? "All of us admit is ugly"?) I found
+a promising continuation for the key at line 417. I'd be willing to bet that
+the key reads
+
+```
+... [315] us admit is ugly; it has a smug ... [417] centers in other parts of the world. How (t) ... [608] seasons are di(???) ...
+```
+
+And the plaintext reads
+
+```
+... [315] cryptographic algorithms ... [417] cryptographic algorithms themselves... [608] cryptography ...
+```
+
+Now, we have revealed enough of the key that we can try to Google it. (We can
+use double-quotes to match the text exactly:)
+
+```Google search
+"us admit is ugly it has a smug" "centers in other parts of the world" "seasons are"
+```
+
+This gives us results for a book called "The Plague", by Albert Camus. The book
+opens:
+
+```
+The unusual events described in this chronicle occurred in 194- at Oran. Everyone agreed that, considering their somewhat extraordinary character, they were out of place there. For its ordinariness is what strikes one first about the town of Oran, which is merely a large French port on the Algerian coast, headquarters of the Prefect of a French Department.The town itself, let us admit, is ugly. It has a smug, placid air and you need time to discover what it is that makes it different from so many business centers in other parts of the world. How to conjure up a picture, for instance, of a town without pigeons, without any trees or gardens, where you never hear the beat of wings or the rustle of leaves, a thoroughly negative place, in short? The seasons are discriminated only in the sky. All that tells you of spring's coming is the feel of the air, or the baskets of flowers brought in from the suburbs by peddlers; it's a spring cried in the marketplaces. During the summer the sun bakes the houses bone-dry, sprinkles our walls with grayish dust, and you have no option but to survive those days of fire indoors, behind closed shutters. In autumn, on the other hand, we have deluges of mud. Only winter brings really pleasant weather.Perhaps the easiest way of making a town's acquaintance is to ascertain how the people in it work, how they love, and how they die. In our little town (is this, one wonders, an effect of the climate? All three are done on much the same lines, with the same feverish yet casual air. The truth is that everyone is bored, and devotes himself to cultivating habits.
+```
+
+After some trial-and-error, we can find that the key begins with the title of
+the book, followed by the first two paragraphs. The full key is:
+
+```
+The Plague:
+
+The unusual events described in this chronicle occurred in 194- at Oran. Everyone agreed that, considering their somewhat extraordinary character, they were out of place there. For its ordinariness is what strikes one first about the town of Oran, which is merely a large French port on the Algerian coast, headquarters of the Prefect of a French Department.The town itself, let us admit, is ugly. It has a smug, placid air and you need time to discover what it is that makes it different from so many business centers in other parts of the world. How to conjure up a picture, for instance, of a town without pigeons, without any trees or gardens, where you never hear the beat of wings or the rustle of leaves, a thoroughly negative place, in short? The seasons are discriminated only in the sky. All that tells you of spring's coming is the feel of the air, or the baskets of flowers brought in from the suburbs by peddlers; it's a spring cried in the marketplaces. During the summer the sun bakes the houses bone-dry, sprinkles our walls with grayish dust, and you have no option but to survive those days of fire indoors, behind closed shutters. In autumn, on the other hand, we have deluges of mud. Only winter brings really pleasant weather.
+```
+
+Note in particular that the year "194-" is not spelled out, so it's ignored for
+the purposes of encryption and decryption.
+
+The full plaintext is
+
+```
+cryptanalysisfromthegreekkryptoshiddenandanalyeintoloosenortountieisthestudyofanalyzinginformationsystemsinordertostudythehiddenaspectsofthesystemscryptanalysisisusedtobreachcryptographicsecuritysystemsandgainaccesstothecontentsofencryptedmessagesevenifthecryptographickeyisunknowninadditiontomathematicalanalysisofcryptographicalgorithmscryptanalysisincludesthestudyofsidechannelattacksthatdonottargetweaknessesinthecryptographicalgorithmsthemselvesbutinsteadexploitweaknessesintheirimplementationeventhoughthegoalhasbeenthesamethemethodsandtechniquesofcryptanalysishavechangeddrasticallythroughthehistoryofcryptographyadaptingtoincreasingcryptographiccomplexityrangingfromthepenandpapermethodsofthepastthroughmachineslikethebritishbombesandcolossuscomputersatbletchleyparkinworldwartwotothemathematicallyadvancedcomputerizedschemesofthepresentmethodsforbreakingmoderncryptosystemsofteninvolvesolvingcarefullyconstructedproblemsinpuremathematicsthebestknownbeingintegerfactorizationoverviewgivensom
 ```
